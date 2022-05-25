@@ -9,27 +9,40 @@ const port = 3000;
 
 const server = http.createServer((req, res) => {
   
-  // ACOES QUE QUERO FAZER NESSE PROJETO
+  var resposta;
+  const urlparse = url.parse(req.url, true);
+  const params = queryString.parse(urlparse.search);
 
-  let resposta;
+  // criar e atualizar usuario
+  if(urlparse.pathname == '/criar-usuario') {
 
-  // criar usuario
       // receber informacoes do usuario direto na barra de busca
-      const params = queryString.parse(url.parse(req.url, true).search);
+      
       
       // salvar essas informacoes
       fs.writeFile('users/' + params.id + '.txt', JSON.stringify(params), function (err){
         if(err) throw err;
         console.log('Saved!');
+
+        res.statusCode = 201;
+        res.setHeader('Content-Type', 'text/plain');
+        res.end(resposta);
       });
 
       resposta = 'Usuario criado com sucesso!';
-  // atualizar usuario
+  }
   // selecionar/pesquisar usuario
+  else if(urlparse.pathname == '/selecionar-usuario'){
+    fs.readFile('users/' + params.id + '.txt', function(err, data) {
+      resposta = data;
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(resposta);
+    });
+  }
+
   // remover usuario
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end(resposta);
 });
 
 server.listen(port, hostname, () => {
